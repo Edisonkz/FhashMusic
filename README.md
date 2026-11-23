@@ -158,5 +158,5 @@ Distribuido bajo la licencia **MIT**. Consulta el archivo [LICENSE](./LICENSE) p
 ---
 
 <div align="center">
-  Desarrollado por <a href="https://github.com/Edisonkz">Edison Edgar Sivipaucar Quispe Quispe</a>
+  Desarrollado por <a href="https://github.com/Edisonkz">Edison Edgar Sivipaucar Quispe </a>
 </div>
