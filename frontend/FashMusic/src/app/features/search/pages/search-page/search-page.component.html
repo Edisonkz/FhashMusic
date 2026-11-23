@@ -1,0 +1,105 @@
+<div class="page-shell">
+  <header class="hero-card">
+    <div class="hero-top">
+      <div>
+        <div class="page-eyebrow">
+          <span>Descubrimiento Musical</span>
+        </div>
+        <h1 class="page-title">Encuentra y reproduce tu próxima canción</h1>
+        <p class="page-subtitle">
+          Explora catálogo en tiempo real, preescucha al instante, organiza tu biblioteca o envía a la cola de descarga en MP3 320kbps y MP4.
+        </p>
+      </div>
+      @if (isDemoResponse()) {
+        <span class="badge badge-primary">Catálogo Demo Activo</span>
+      } @else {
+        <span class="badge badge-success">Conectado a API</span>
+      }
+    </div>
+
+    <app-search-bar
+      [initialQuery]="activeQuery()"
+      [isLoading]="isLoading()"
+      (searchSubmitted)="onSearch($event)"
+    ></app-search-bar>
+
+    <div class="chips-bar">
+      <div class="chip-group" role="tablist" aria-label="Filtrar por género">
+        @for (genre of quickGenres; track genre) {
+          <button
+            type="button"
+            class="chip"
+            [class.active]="selectedGenre() === genre"
+            (click)="selectGenre(genre)">
+            {{ genre }}
+          </button>
+        }
+      </div>
+
+      @if (recentSearches().length > 0) {
+        <div class="recent-row">
+          <span class="recent-label">Recientes:</span>
+          @for (term of recentSearches(); track term) {
+            <button type="button" class="recent-pill" (click)="onSearch(term)">
+              {{ term }}
+            </button>
+          }
+        </div>
+      }
+    </div>
+  </header>
+
+  <section class="results-section">
+    <div class="section-bar">
+      <h2 class="section-title">{{ sectionHeading() }}</h2>
+      <span class="badge badge-neutral">{{ visibleSongs().length }} pistas</span>
+    </div>
+
+    @if (isLoading()) {
+      <div class="skeleton-grid" aria-label="Cargando resultados">
+        @for (item of skeletonItems; track item) {
+          <div class="skeleton-card surface-card">
+            <div class="skeleton sk-thumb"></div>
+            <div class="sk-body">
+              <div class="skeleton sk-line"></div>
+              <div class="skeleton sk-line short"></div>
+              <div class="sk-btns">
+                <div class="skeleton sk-btn"></div>
+                <div class="skeleton sk-btn"></div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    } @else if (error()) {
+      <div class="state-panel">
+        <div class="state-icon-wrap">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+        </div>
+        <h3>Ocurrió un problema</h3>
+        <p class="page-subtitle">{{ error() }}</p>
+        <button type="button" class="btn btn-secondary" (click)="onSearch(activeQuery())">Reintentar</button>
+      </div>
+    } @else if (visibleSongs().length > 0) {
+      <app-result-gallery
+        [songs]="visibleSongs()"
+        (downloadRequested)="handleDownload($event)"
+        (previewRequested)="handlePreview($event)"
+        (libraryToggled)="handleLibraryToggle($event)"
+      ></app-result-gallery>
+    } @else {
+      <div class="state-panel">
+        <div class="state-icon-wrap">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
+          </svg>
+        </div>
+        <h3>Sin coincidencias en este filtro</h3>
+        <p class="page-subtitle">Prueba con otro género o limpia la búsqueda para ver todo el catálogo.</p>
+        <button type="button" class="btn btn-primary" (click)="selectGenre('Todos')">Ver todas las pistas</button>
+      </div>
+    }
+  </section>
+</div>

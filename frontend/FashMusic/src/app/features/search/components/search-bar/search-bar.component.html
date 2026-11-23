@@ -1,0 +1,31 @@
+<form class="search-form" (ngSubmit)="submit()" role="search">
+  <span class="search-icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
+    </svg>
+  </span>
+
+  <input
+    type="search"
+    name="searchQuery"
+    class="search-input"
+    [ngModel]="query()"
+    (ngModelChange)="query.set($event)"
+    placeholder="Busca canciones, artistas, géneros o pega un enlace de YouTube..."
+    autocomplete="off"
+    aria-label="Buscar canciones" />
+
+  @if (query()) {
+    <button type="button" class="clear-btn" (click)="clear()" aria-label="Limpiar búsqueda">
+      ×
+    </button>
+  }
+
+  <button type="submit" class="btn btn-primary submit-btn" [disabled]="isLoading() || !query().trim()">
+    @if (isLoading()) {
+      Buscando...
+    } @else {
+      Buscar
+    }
+  </button>
+</form>

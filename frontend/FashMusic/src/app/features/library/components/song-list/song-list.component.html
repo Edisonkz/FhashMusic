@@ -1,0 +1,83 @@
+<div class="tracklist surface-card">
+  <div class="list-head">
+    <span>#</span>
+    <span>Canción</span>
+    <span class="col-genre">Género</span>
+    <span class="col-dur">Duración</span>
+    <span class="col-actions">Acciones</span>
+  </div>
+
+  @for (song of songs(); track song.id; let i = $index) {
+    <div class="track-row" [class.active]="isCurrent(song.id)">
+      <div class="col-index">
+        @if (isPlaying(song.id)) {
+          <span class="eq-bars eq-accent" aria-hidden="true"><span></span><span></span><span></span></span>
+        } @else {
+          <span class="idx-num">{{ i + 1 }}</span>
+        }
+      </div>
+
+      <button type="button" class="track-main" (click)="playRequested.emit(song)">
+        <div class="track-thumb">
+          @if (song.thumbnail) {
+            <img [src]="song.thumbnail" [alt]="song.title" loading="lazy" />
+          } @else {
+            <span>♪</span>
+          }
+        </div>
+        <div class="track-copy">
+          <span class="track-title">{{ song.title }}</span>
+          <span class="track-artist">{{ song.uploader }}</span>
+        </div>
+      </button>
+
+      <div class="col-genre">
+        @if (song.genre) {
+          <span class="badge badge-neutral">{{ song.genre }}</span>
+        } @else {
+          <span class="muted-dash">—</span>
+        }
+      </div>
+
+      <div class="col-dur">{{ song.duration | duration }}</div>
+
+      <div class="col-actions">
+        <button
+          type="button"
+          class="icon-btn"
+          (click)="playRequested.emit(song)"
+          [attr.aria-label]="isPlaying(song.id) ? 'Pausar ' + song.title : 'Reproducir ' + song.title">
+          @if (isPlaying(song.id)) {
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+              <rect x="6" y="5" width="4" height="14" rx="1" /><rect x="14" y="5" width="4" height="14" rx="1" />
+            </svg>
+          } @else {
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+              <path d="M8 5.14v14l11-7-11-7z" />
+            </svg>
+          }
+        </button>
+
+        <button
+          type="button"
+          class="icon-btn"
+          (click)="downloadRequested.emit(song)"
+          [attr.aria-label]="'Descargar ' + song.title + ' en MP3'">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+        </button>
+
+        <button
+          type="button"
+          class="icon-btn remove-btn"
+          (click)="removeRequested.emit(song.id)"
+          [attr.aria-label]="'Eliminar ' + song.title">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  }
+</div>
