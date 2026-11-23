@@ -1,142 +1,78 @@
-.header-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.65rem;
+.downloads-hero {
+  background:
+    linear-gradient(105deg, rgba(20, 23, 32, 0.96) 0%, rgba(28, 34, 48, 0.85) 55%, rgba(255, 107, 44, 0.18) 100%);
 }
 
-.stats-grid {
+.queue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.queue-row {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-}
-
-.stat-card {
-  padding: 1.05rem 1.2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-}
-
-.stat-label {
-  font-size: 0.78rem;
-  color: var(--color-text-muted);
-}
-
-.stat-value {
-  font-family: var(--font-display);
-  font-size: 1.5rem;
-  font-weight: 800;
-}
-
-.stat-value.accent { color: var(--color-primary-light); }
-.stat-value.success { color: #34d399; }
-.stat-value.danger { color: #fb7185; }
-
-.tasks-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.9rem;
-}
-
-.task-card {
-  padding: 1.1rem 1.2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.95rem;
-}
-
-.task-top {
-  display: flex;
-  flex-wrap: wrap;
+  grid-template-columns: minmax(220px, 1.15fr) minmax(220px, 1fr);
   align-items: center;
-  justify-content: space-between;
-  gap: 0.85rem;
+  gap: 1.1rem;
+  padding: 0.85rem 1.05rem;
 }
 
-.task-info {
+.queue-row.row-converting,
+.queue-row.row-downloading {
+  border-color: var(--border-strong);
+  background: linear-gradient(90deg, rgba(255, 107, 44, 0.14), rgba(34, 40, 54, 0.82) 55%);
+}
+
+.queue-row.row-completed {
+  border-color: rgba(16, 185, 129, 0.25);
+  background: linear-gradient(90deg, rgba(16, 185, 129, 0.1), rgba(34, 40, 54, 0.8) 55%);
+}
+
+.queue-left {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
+  gap: 0.8rem;
   min-width: 0;
-  flex: 1 1 220px;
 }
 
-.task-thumb {
+.queue-thumb {
   width: 48px;
   height: 48px;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   overflow: hidden;
-  background: var(--color-surface-active);
+  background: var(--color-surface-solid);
   display: grid;
   place-items: center;
-  color: var(--color-primary-light);
   flex-shrink: 0;
 }
 
-.task-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+.queue-thumb img { width: 100%; height: 100%; object-fit: cover; }
 
-.task-meta {
+.queue-info { display: flex; flex-direction: column; gap: 0.35rem; min-width: 0; }
+
+.queue-title-line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
   min-width: 0;
+  font-size: 0.92rem;
 }
 
-.task-title {
-  font-size: 0.96rem;
-  font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+.queue-title { color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.queue-sep, .queue-artist { color: var(--color-text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.84rem; }
 
-.task-artist {
-  font-size: 0.8rem;
-  color: var(--color-text-muted);
-}
+.queue-badges { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.fmt-code { font-family: var(--font-mono); }
 
-.task-badges {
+.queue-right {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.65rem;
 }
 
-.format-pill {
-  font-family: var(--font-mono);
-}
+.queue-progress { flex: 1; min-width: 0; }
+.retry-btn { min-height: 32px; padding: 0.25rem 0.65rem; font-size: 0.76rem; }
 
-.btn-sm {
-  min-height: 32px;
-  padding: 0.3rem 0.7rem;
-  font-size: 0.78rem;
-}
-
-.output-path {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.5rem 0.75rem;
-  border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-subtle);
-  font-size: 0.78rem;
-}
-
-.path-label {
-  color: var(--color-text-muted);
-}
-
-.output-path code {
-  font-family: var(--font-mono);
-  color: #34d399;
-  word-break: break-all;
-}
-
-@media (max-width: 720px) {
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
+@media (max-width: 820px) {
+  .queue-row { grid-template-columns: 1fr; gap: 0.75rem; }
 }

@@ -11,194 +11,64 @@
 
 .song-card.is-active {
   border-color: var(--border-strong);
-  background: var(--color-surface-hover);
+  background: var(--color-active-gradient);
 }
 
 .thumb-wrap {
   position: relative;
   aspect-ratio: 16 / 10;
-  background: var(--color-bg-elevated);
+  background: var(--color-surface-solid);
   overflow: hidden;
   cursor: pointer;
 }
 
-.thumb-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.4s var(--ease-out);
-}
-
-.song-card:hover .thumb-img {
-  transform: scale(1.06);
-}
-
-.thumb-fallback {
-  width: 100%;
-  height: 100%;
-  display: grid;
-  place-items: center;
-  color: var(--color-primary-light);
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(6, 182, 212, 0.12));
-}
-
-.thumb-scrim {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(9, 9, 15, 0.08) 0%, rgba(9, 9, 15, 0.72) 100%);
-  opacity: 0.75;
-  transition: opacity var(--duration-fast) ease;
-}
-
-.song-card:hover .thumb-scrim {
-  opacity: 0.95;
-}
+.thumb-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.35s var(--ease-out); }
+.song-card:hover .thumb-img { transform: scale(1.05); }
+.thumb-fallback { width: 100%; height: 100%; display: grid; place-items: center; color: var(--color-primary-light); }
+.thumb-scrim { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 15%, rgba(16, 20, 30, 0.82) 100%); }
 
 .genre-tag {
-  position: absolute;
-  top: 0.65rem;
-  left: 0.65rem;
-  padding: 0.2rem 0.55rem;
-  border-radius: var(--radius-full);
-  background: rgba(9, 9, 15, 0.72);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  font-size: 0.68rem;
-  font-weight: 600;
-  color: var(--color-text);
+  position: absolute; top: 0.6rem; left: 0.6rem;
+  padding: 0.18rem 0.55rem; border-radius: var(--radius-full);
+  background: rgba(16, 20, 30, 0.75); border: 1px solid rgba(255, 255, 255, 0.14);
+  font-size: 0.68rem; font-weight: 600;
 }
 
 .duration-pill {
-  position: absolute;
-  bottom: 0.65rem;
-  left: 0.65rem;
-  padding: 0.18rem 0.5rem;
-  border-radius: 6px;
-  background: rgba(9, 9, 15, 0.8);
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: var(--color-text);
+  position: absolute; bottom: 0.6rem; left: 0.6rem;
+  padding: 0.15rem 0.45rem; border-radius: 6px;
+  background: rgba(16, 20, 30, 0.8); font-family: var(--font-mono); font-size: 0.7rem;
 }
 
 .play-fab {
-  position: absolute;
-  right: 0.7rem;
-  bottom: 0.65rem;
-  width: 42px;
-  height: 42px;
-  border-radius: var(--radius-full);
-  border: none;
-  background: var(--color-primary);
-  color: #fff;
-  display: grid;
-  place-items: center;
-  box-shadow: 0 8px 20px rgba(139, 92, 246, 0.55);
-  transform: translateY(4px);
-  opacity: 0.92;
-  transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) ease;
+  position: absolute; right: 0.65rem; bottom: 0.6rem;
+  width: 40px; height: 40px; border-radius: 50%; border: none;
+  background: var(--color-primary); color: #fff;
+  display: grid; place-items: center;
+  box-shadow: var(--shadow-orange);
+  transition: transform var(--duration-fast) ease;
 }
 
-.song-card:hover .play-fab,
-.song-card.is-active .play-fab {
-  transform: translateY(0) scale(1.04);
-  opacity: 1;
-}
+.play-fab:hover { transform: scale(1.06); }
 
-.play-fab:hover {
-  background: var(--color-primary-light);
-}
-
-.card-body {
-  padding: 0.9rem 0.95rem 0.95rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-  flex: 1;
-}
-
-.card-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.5rem;
-}
-
-.card-meta {
-  min-width: 0;
-  flex: 1;
-}
-
-.song-title {
-  font-size: 0.95rem;
-  font-weight: 700;
-  line-height: 1.3;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.song-artist {
-  margin-top: 0.2rem;
-  font-size: 0.8rem;
-  color: var(--color-text-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+.card-body { padding: 0.85rem; display: flex; flex-direction: column; gap: 0.7rem; flex: 1; }
+.card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.45rem; }
+.card-meta { min-width: 0; flex: 1; }
+.song-title { font-size: 0.92rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.song-artist { margin-top: 0.15rem; font-size: 0.78rem; color: var(--color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .fav-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: var(--radius-full);
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--color-text-muted);
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  transition: all var(--duration-fast) ease;
+  width: 32px; height: 32px; border-radius: 50%; border: none; background: transparent;
+  color: var(--color-text-muted); display: grid; place-items: center;
 }
+.fav-btn:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+.fav-btn.saved { color: var(--color-primary); }
 
-.fav-btn:hover {
-  background: rgba(255, 255, 255, 0.07);
-  color: var(--color-text);
-}
-
-.fav-btn.saved {
-  color: var(--color-danger);
-  background: var(--color-danger-soft);
-}
-
-.card-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-  margin-top: auto;
-}
-
+.card-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem; margin-top: auto; }
 .dl-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  min-height: 36px;
-  border-radius: var(--radius-sm);
-  font-size: 0.78rem;
-  font-weight: 600;
-  border: 1px solid var(--border-subtle);
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--color-text-secondary);
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem;
+  min-height: 34px; border-radius: var(--radius-sm); font-size: 0.76rem; font-weight: 600;
+  border: 1px solid var(--border-subtle); background: rgba(255, 255, 255, 0.05); color: var(--color-text-secondary);
   transition: all var(--duration-fast) ease;
 }
-
-.dl-mp3:hover {
-  background: var(--color-primary-soft);
-  border-color: rgba(139, 92, 246, 0.4);
-  color: var(--color-primary-light);
-}
-
-.dl-mp4:hover {
-  background: rgba(6, 182, 212, 0.14);
-  border-color: rgba(6, 182, 212, 0.4);
-  color: #22d3ee;
-}
+.dl-btn:hover { background: var(--color-primary-soft); border-color: var(--border-strong); color: #fff; }

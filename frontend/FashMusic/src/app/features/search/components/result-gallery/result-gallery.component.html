@@ -1,10 +1,66 @@
-<div class="gallery-grid">
-  @for (song of songs(); track song.id) {
-    <app-song-card
-      [song]="song"
-      (downloadRequested)="downloadRequested.emit($event)"
-      (previewRequested)="previewRequested.emit($event)"
-      (libraryToggled)="libraryToggled.emit($event)"
-    ></app-song-card>
-  }
-</div>
+@if (viewMode() === 'grid') {
+  <div class="gallery-grid">
+    @for (song of songs(); track song.id) {
+      <app-song-card
+        [song]="song"
+        (downloadRequested)="downloadRequested.emit($event)"
+        (previewRequested)="previewRequested.emit($event)"
+        (libraryToggled)="libraryToggled.emit($event)"
+      ></app-song-card>
+    }
+  </div>
+} @else {
+  <div class="editorial-list" role="list">
+    @for (song of songs(); track song.id) {
+      <div
+        class="editorial-row"
+        [class.is-active]="isCurrent(song.id)"
+        role="listitem">
+        <button type="button" class="row-play" (click)="previewRequested.emit(song)">
+          <span class="row-thumb">
+            @if (song.thumbnail) {
+              <img [src]="song.thumbnail" [alt]="song.title" loading="lazy" />
+            } @else {
+              ♪
+            }
+          </span>
+
+          <span class="row-title-wrap">
+            @if (isPlaying(song.id)) {
+              <span class="eq-bars" aria-hidden="true"><span></span><span></span><span></span></span>
+            }
+            <span class="row-title" [title]="song.title">{{ song.title }}</span>
+          </span>
+        </button>
+
+        <span class="row-artist">— {{ song.uploader }}</span>
+        <span class="row-dur">{{ song.duration | duration }}</span>
+
+        <div class="row-actions">
+          <button
+            type="button"
+            class="fmt-pill"
+            (click)="downloadRequested.emit({ song, format: 'mp3' })">
+            MP3
+          </button>
+          <button
+            type="button"
+            class="fmt-pill"
+            (click)="downloadRequested.emit({ song, format: 'mp4' })">
+            MP4
+          </button>
+          <button
+            type="button"
+            class="heart-btn"
+            [class.saved]="library.isSaved(song.id)"
+            (click)="libraryToggled.emit(song)"
+            [attr.aria-label]="library.isSaved(song.id) ? 'Quitar de favoritos' : 'Guardar en biblioteca'">
+            <svg viewBox="0 0 24 24" width="16" height="16" [attr.fill]="library.isSaved(song.id) ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2">
+              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+}

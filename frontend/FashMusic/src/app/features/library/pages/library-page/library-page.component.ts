@@ -23,6 +23,8 @@ export class LibraryPageComponent implements OnInit {
 
   protected readonly query = signal('');
   protected readonly sortBy = signal<LibrarySort>('recent');
+  protected readonly selectedQuality = signal<'FLAC' | '320' | '128'>('320');
+  protected readonly qualityOptions = ['FLAC', '320', '128'] as const;
 
   protected readonly filteredSongs = computed(() => {
     const q = this.query().trim().toLowerCase();

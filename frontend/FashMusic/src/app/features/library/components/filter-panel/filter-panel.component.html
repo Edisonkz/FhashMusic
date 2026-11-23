@@ -1,37 +1,25 @@
-<div class="filter-panel surface-card">
-  <div class="filter-search">
-    <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2">
+<div class="tabs-bar">
+  <div class="tabs-list" role="tablist" aria-label="Ordenar biblioteca">
+    <button type="button" class="tab-btn" [class.active]="selectedSort() === 'recent'" (click)="selectSort('recent')">
+      Recientes
+    </button>
+    <button type="button" class="tab-btn" [class.active]="selectedSort() === 'title'" (click)="selectSort('title')">
+      A–Z
+    </button>
+    <button type="button" class="tab-btn" [class.active]="selectedSort() === 'duration'" (click)="selectSort('duration')">
+      Duración
+    </button>
+  </div>
+
+  <div class="inline-filter">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
       <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
     </svg>
     <input
       type="search"
       [ngModel]="searchQuery()"
       (ngModelChange)="onSearchInput($event)"
-      placeholder="Filtrar en tu biblioteca por título o artista..."
+      placeholder="Filtrar..."
       aria-label="Filtrar biblioteca" />
-  </div>
-
-  <div class="sort-pills" role="group" aria-label="Ordenar biblioteca">
-    <button
-      type="button"
-      class="sort-pill"
-      [class.active]="selectedSort() === 'recent'"
-      (click)="selectSort('recent')">
-      Recientes
-    </button>
-    <button
-      type="button"
-      class="sort-pill"
-      [class.active]="selectedSort() === 'title'"
-      (click)="selectSort('title')">
-      A–Z
-    </button>
-    <button
-      type="button"
-      class="sort-pill"
-      [class.active]="selectedSort() === 'duration'"
-      (click)="selectSort('duration')">
-      Duración
-    </button>
   </div>
 </div>

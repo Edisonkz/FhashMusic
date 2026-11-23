@@ -1,40 +1,45 @@
 <div class="page-shell">
-  <header class="page-header">
-    <div>
-      <div class="page-eyebrow">Colección Personal</div>
-      <h1 class="page-title">Mi Biblioteca</h1>
-      <p class="page-subtitle">Tus canciones guardadas, sincronizadas localmente y listas para reproducir o exportar.</p>
+  <!-- Cinematic Hero Banner (Mockup 2) -->
+  <header class="hero-banner library-hero">
+    <div class="hero-breadcrumb">
+      <span>Inicio</span> / <span>Mi Biblioteca</span> / <strong>Colección Personal</strong>
     </div>
 
-    <div class="header-actions">
-      <button
-        type="button"
-        class="btn btn-primary"
-        [disabled]="filteredSongs().length === 0"
-        (click)="playAll()">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-          <path d="M8 5.14v14l11-7-11-7z" />
-        </svg>
-        Reproducir todo
-      </button>
-      <a routerLink="/search" class="btn btn-secondary">Explorar más</a>
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <span class="hero-pill">Colección Local</span>
+        <h1 class="hero-title">Mi Biblioteca</h1>
+        <p class="hero-sub">
+          Edison · {{ library.count() }} canciones guardadas · {{ library.totalDuration() | duration }}
+        </p>
+      </div>
+
+      <div class="hero-controls">
+        <div class="quality-group" role="group" aria-label="Calidad">
+          @for (q of qualityOptions; track q) {
+            <button
+              type="button"
+              class="quality-opt"
+              [class.active]="selectedQuality() === q"
+              (click)="selectedQuality.set(q)">
+              {{ q }}
+            </button>
+          }
+        </div>
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          [disabled]="filteredSongs().length === 0"
+          (click)="playAll()">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+            <path d="M8 5.14v14l11-7-11-7z" />
+          </svg>
+          Reproducir todo
+        </button>
+      </div>
     </div>
   </header>
-
-  <section class="stats-grid" aria-label="Resumen de biblioteca">
-    <div class="stat-card surface-card">
-      <span class="stat-label">Canciones guardadas</span>
-      <strong class="stat-value">{{ library.count() }}</strong>
-    </div>
-    <div class="stat-card surface-card">
-      <span class="stat-label">Duración acumulada</span>
-      <strong class="stat-value mono">{{ library.totalDuration() | duration }}</strong>
-    </div>
-    <div class="stat-card surface-card">
-      <span class="stat-label">Calidad preferida</span>
-      <strong class="stat-value">MP3 320 kbps</strong>
-    </div>
-  </section>
 
   @if (library.count() > 0) {
     <app-filter-panel
@@ -51,19 +56,19 @@
       ></app-song-list>
     } @else {
       <div class="state-panel">
-        <h3>No hay canciones que coincidan con "{{ query() }}"</h3>
-        <p class="page-subtitle">Prueba con otro término de búsqueda dentro de tu colección.</p>
+        <h3>Sin resultados para "{{ query() }}"</h3>
+        <p class="hero-sub">Prueba otro artista o título dentro de tu colección.</p>
       </div>
     }
   } @else {
     <div class="state-panel">
       <div class="state-icon-wrap">
-        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
         </svg>
       </div>
       <h3>Tu biblioteca está vacía</h3>
-      <p class="page-subtitle">Guarda canciones desde Explorar tocando el icono de corazón para tenerlas siempre a mano.</p>
+      <p class="hero-sub">Guarda canciones desde Explorar para escucharlas y gestionarlas aquí.</p>
       <a routerLink="/search" class="btn btn-primary">Ir a Explorar</a>
     </div>
   }
