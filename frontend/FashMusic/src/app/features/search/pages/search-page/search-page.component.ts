@@ -9,11 +9,12 @@ import { LibraryService } from '../../../library/services/library.service';
 import { PlayerStore } from '../../../../core/services/player.store';
 import { ToastService } from '../../../../core/services/toast.service';
 import { DEMO_CATALOG } from '../../../../core/data/demo-catalog.data';
+import { DurationPipe } from '../../../../shared/pipes/duration.pipe';
 
 @Component({
   selector: 'app-search-page',
   standalone: true,
-  imports: [SearchBarComponent, ResultGalleryComponent],
+  imports: [SearchBarComponent, ResultGalleryComponent, DurationPipe],
   templateUrl: './search-page.component.html',
   styleUrl: './search-page.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -22,7 +23,7 @@ export class SearchPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly searchService = inject(SearchService);
   private readonly downloadService = inject(DownloadService);
-  private readonly libraryService = inject(LibraryService);
+  protected readonly libraryService = inject(LibraryService);
   private readonly playerStore = inject(PlayerStore);
   private readonly toast = inject(ToastService);
 
@@ -45,6 +46,14 @@ export class SearchPageComponent implements OnInit {
     if (genre === 'Todos') return list;
     return list.filter((s) => (s.genre ?? '').toLowerCase() === genre.toLowerCase());
   });
+
+  protected readonly featuredSong = computed(() =>
+    this.playerStore.currentTrack() ?? this.visibleSongs()[0] ?? DEMO_CATALOG[0]
+  );
+
+  protected readonly totalVisibleDuration = computed(() =>
+    this.visibleSongs().reduce((acc, s) => acc + (s.duration || 0), 0)
+  );
 
   ngOnInit(): void {
     this.route.queryParamMap.subscribe((params) => {
@@ -95,18 +104,8 @@ export class SearchPageComponent implements OnInit {
     this.toast.info(`Calidad seleccionada: ${q === 'FLAC' ? 'FLAC Lossless' : q + ' kbps'}`);
   }
 
-  saveAllVisible(): void {
-    const list = this.visibleSongs();
-    let added = 0;
-    for (const song of list) {
-      if (!this.libraryService.isSaved(song.id)) {
-        this.libraryService.addToLibrary(song);
-        added++;
-      }
-    }
-    if (added === 0) {
-      this.toast.info('Todo guardado', 'Estas pistas ya están en tu biblioteca');
-    }
+  toggleFeaturedInLibrary(): void {
+    this.libraryService.toggleLibrary(this.featuredSong());
   }
 
   handleDownload(event: { song: SongResult; format: 'mp3' | 'mp4' }): void {

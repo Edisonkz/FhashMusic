@@ -1,6 +1,8 @@
 <div class="page-shell">
-  <!-- Cinematic Hero Banner (Mockup 3) -->
-  <header class="hero-banner downloads-hero">
+  <!-- Full-Bleed Horizontal Audio Studio Hero Banner -->
+  <header class="hero-banner">
+    <img class="hero-backdrop-img" src="images/hero-studio.jpg" alt="Gestor de Descargas" />
+
     <div class="hero-breadcrumb">
       <span>Inicio</span> / <span>Descargas</span> / <strong>Cola Activa</strong>
     </div>
@@ -25,7 +27,7 @@
     </div>
   </header>
 
-  <!-- Underline Status Tabs -->
+  <!-- Frosted Status Tabs Strip -->
   <div class="tabs-bar">
     <div class="tabs-list" role="tablist" aria-label="Filtrar descargas">
       <button type="button" class="tab-btn" [class.active]="activeTab() === 'all'" (click)="activeTab.set('all')">
@@ -43,65 +45,67 @@
     </div>
   </div>
 
-  @if (filteredTasks().length > 0) {
-    <section class="queue-list">
-      @for (task of filteredTasks(); track task.song_id) {
-        <article class="queue-row surface-card" [class]="'queue-row surface-card row-' + task.status">
-          <div class="queue-left">
-            <div class="queue-thumb">
-              @if (task.thumbnail) {
-                <img [src]="task.thumbnail" [alt]="task.title || task.song_id" loading="lazy" />
-              } @else {
-                <span>♪</span>
+  <section class="page-body">
+    @if (filteredTasks().length > 0) {
+      <div class="queue-list">
+        @for (task of filteredTasks(); track task.song_id) {
+          <article class="queue-row surface-card" [class]="'queue-row surface-card row-' + task.status">
+            <div class="queue-left">
+              <div class="queue-thumb">
+                @if (task.thumbnail) {
+                  <img [src]="task.thumbnail" [alt]="task.title || task.song_id" loading="lazy" />
+                } @else {
+                  <span>♪</span>
+                }
+              </div>
+
+              <div class="queue-info">
+                <div class="queue-title-line">
+                  <strong class="queue-title">{{ task.title || task.song_id }}</strong>
+                  <span class="queue-sep">—</span>
+                  <span class="queue-artist">{{ task.uploader || 'YouTube Audio' }}</span>
+                </div>
+                <div class="queue-badges">
+                  <span class="badge badge-neutral fmt-code">
+                    {{ task.format === 'mp3' ? 'MP3 · 320k' : 'MP4 · HD' }}
+                  </span>
+                  <span [class]="getBadgeClass(task.status)">{{ getStatusLabel(task.status) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="queue-right">
+              <div class="queue-progress">
+                <app-progress-bar
+                  [progress]="task.progress"
+                  [status]="task.status"
+                  [statusText]="getStatusText(task)"
+                ></app-progress-bar>
+              </div>
+
+              @if (task.status === 'failed') {
+                <button type="button" class="btn btn-secondary retry-btn" (click)="downloads.retryTask(task.song_id)">
+                  Reintentar
+                </button>
               }
-            </div>
 
-            <div class="queue-info">
-              <div class="queue-title-line">
-                <strong class="queue-title">{{ task.title || task.song_id }}</strong>
-                <span class="queue-sep">—</span>
-                <span class="queue-artist">{{ task.uploader || 'YouTube Audio' }}</span>
-              </div>
-              <div class="queue-badges">
-                <span class="badge badge-neutral fmt-code">
-                  {{ task.format === 'mp3' ? 'MP3 · 320k' : 'MP4 · HD' }}
-                </span>
-                <span [class]="getBadgeClass(task.status)">{{ getStatusLabel(task.status) }}</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="queue-right">
-            <div class="queue-progress">
-              <app-progress-bar
-                [progress]="task.progress"
-                [status]="task.status"
-                [statusText]="getStatusText(task)"
-              ></app-progress-bar>
-            </div>
-
-            @if (task.status === 'failed') {
-              <button type="button" class="btn btn-secondary retry-btn" (click)="downloads.retryTask(task.song_id)">
-                Reintentar
+              <button
+                type="button"
+                class="icon-btn"
+                (click)="downloads.removeTask(task.song_id)"
+                aria-label="Quitar de la cola">
+                ×
               </button>
-            }
-
-            <button
-              type="button"
-              class="icon-btn"
-              (click)="downloads.removeTask(task.song_id)"
-              aria-label="Quitar de la cola">
-              ×
-            </button>
-          </div>
-        </article>
-      }
-    </section>
-  } @else {
-    <div class="state-panel">
-      <h3>Sin descargas en esta vista</h3>
-      <p class="hero-sub">Envía cualquier pista desde Explorar o Mi Biblioteca para iniciar su extracción.</p>
-      <a routerLink="/search" class="btn btn-primary">Explorar canciones</a>
-    </div>
-  }
+            </div>
+          </article>
+        }
+      </div>
+    } @else {
+      <div class="state-panel">
+        <h3>Sin descargas en esta vista</h3>
+        <p class="hero-sub">Envía cualquier pista desde Explorar o Mi Biblioteca para iniciar su extracción.</p>
+        <a routerLink="/search" class="btn btn-primary">Explorar canciones</a>
+      </div>
+    }
+  </section>
 </div>

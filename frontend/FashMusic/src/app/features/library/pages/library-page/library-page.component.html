@@ -1,6 +1,8 @@
 <div class="page-shell">
-  <!-- Cinematic Hero Banner (Mockup 2) -->
-  <header class="hero-banner library-hero">
+  <!-- Full-Bleed Horizontal Vinyl Hero Banner -->
+  <header class="hero-banner">
+    <img class="hero-backdrop-img" src="images/hero-vinyl.jpg" alt="Mi Biblioteca FhashMusic" />
+
     <div class="hero-breadcrumb">
       <span>Inicio</span> / <span>Mi Biblioteca</span> / <strong>Colección Personal</strong>
     </div>
@@ -10,8 +12,17 @@
         <span class="hero-pill">Colección Local</span>
         <h1 class="hero-title">Mi Biblioteca</h1>
         <p class="hero-sub">
-          Edison · {{ library.count() }} canciones guardadas · {{ library.totalDuration() | duration }}
+          Edison
+          <span class="verified-badge" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+              <path d="M12 2l2.4 2.1 3.2-.3.9 3.1 2.8 1.6-.9 3.1.9 3.1-2.8 1.6-.9 3.1-3.2-.3L12 22l-2.4-2.1-3.2.3-.9-3.1-2.8-1.6.9-3.1-.9-3.1 2.8-1.6.9-3.1 3.2.3L12 2zm-1.2 13.2l5.2-5.2-1.4-1.4-3.8 3.8-1.8-1.8-1.4 1.4 3.2 3.2z" />
+            </svg>
+          </span>
         </p>
+        <div class="hero-meta-row">
+          <span class="hero-meta-item">{{ library.count() }} canciones guardadas</span>
+          <span class="hero-meta-item">{{ library.totalDuration() | duration }}</span>
+        </div>
       </div>
 
       <div class="hero-controls">
@@ -47,29 +58,38 @@
       (sortChanged)="sortBy.set($event)"
     ></app-filter-panel>
 
-    @if (filteredSongs().length > 0) {
-      <app-song-list
-        [songs]="filteredSongs()"
-        (playRequested)="handlePlay($event)"
-        (downloadRequested)="handleDownload($event)"
-        (removeRequested)="handleRemove($event)"
-      ></app-song-list>
-    } @else {
-      <div class="state-panel">
-        <h3>Sin resultados para "{{ query() }}"</h3>
-        <p class="hero-sub">Prueba otro artista o título dentro de tu colección.</p>
+    <section class="page-body">
+      <div class="section-header-row">
+        <h2 class="section-heading">Mi Biblioteca <span>(Colección Personal)</span></h2>
+        <span class="section-count">{{ filteredSongs().length }} tracks</span>
       </div>
-    }
+
+      @if (filteredSongs().length > 0) {
+        <app-song-list
+          [songs]="filteredSongs()"
+          (playRequested)="handlePlay($event)"
+          (downloadRequested)="handleDownload($event)"
+          (removeRequested)="handleRemove($event)"
+        ></app-song-list>
+      } @else {
+        <div class="state-panel">
+          <h3>Sin resultados para "{{ query() }}"</h3>
+          <p class="hero-sub">Prueba otro artista o título dentro de tu colección.</p>
+        </div>
+      }
+    </section>
   } @else {
-    <div class="state-panel">
-      <div class="state-icon-wrap">
-        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
-        </svg>
+    <section class="page-body">
+      <div class="state-panel">
+        <div class="state-icon-wrap">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
+          </svg>
+        </div>
+        <h3>Tu biblioteca está vacía</h3>
+        <p class="hero-sub">Guarda canciones desde Explorar para escucharlas y gestionarlas aquí.</p>
+        <a routerLink="/search" class="btn btn-primary">Ir a Explorar</a>
       </div>
-      <h3>Tu biblioteca está vacía</h3>
-      <p class="hero-sub">Guarda canciones desde Explorar para escucharlas y gestionarlas aquí.</p>
-      <a routerLink="/search" class="btn btn-primary">Ir a Explorar</a>
-    </div>
+    </section>
   }
 </div>
