@@ -2,74 +2,47 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.45rem 0.45rem 0.45rem 1.05rem;
-  border-radius: var(--radius-xl);
-  background: var(--color-surface);
+  padding: 0.32rem 0.35rem 0.32rem 0.9rem;
+  border-radius: var(--radius-md);
+  background: rgba(15, 19, 28, 0.62);
   border: 1px solid var(--border-default);
-  box-shadow: var(--shadow-card);
-  transition: border-color var(--duration-fast) ease, box-shadow var(--duration-fast) ease;
+  transition: border-color var(--duration-fast) ease;
 }
 
 .search-form:focus-within {
-  border-color: var(--color-primary-light);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2), var(--shadow-card);
+  border-color: var(--border-strong);
 }
 
-.search-icon {
-  color: var(--color-text-muted);
-  display: inline-flex;
-  flex-shrink: 0;
-}
+.search-icon { color: var(--color-text-muted); display: inline-flex; flex-shrink: 0; }
 
 .search-input {
   flex: 1;
   min-width: 0;
   border: none;
   background: transparent;
-  color: var(--color-text);
-  font-size: 0.95rem;
+  color: #fff;
+  font-size: 0.9rem;
   outline: none;
-  padding: 0.45rem 0.25rem;
+  padding: 0.38rem 0.2rem;
 }
 
-.search-input::placeholder {
-  color: var(--color-text-muted);
-}
-
-.search-input::-webkit-search-cancel-button {
-  display: none;
-}
+.search-input::placeholder { color: var(--color-text-muted); }
+.search-input::-webkit-search-cancel-button { display: none; }
 
 .clear-btn {
-  width: 30px;
-  height: 30px;
-  border-radius: var(--radius-full);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
   border: none;
   background: rgba(255, 255, 255, 0.08);
   color: var(--color-text-secondary);
-  font-size: 1.15rem;
-  line-height: 1;
+  font-size: 1.05rem;
   display: grid;
   place-items: center;
-  flex-shrink: 0;
-}
-
-.clear-btn:hover {
-  background: rgba(255, 255, 255, 0.16);
-  color: var(--color-text);
 }
 
 .submit-btn {
-  border-radius: 16px;
-  padding: 0.55rem 1.35rem;
-  flex-shrink: 0;
-}
-
-@media (max-width: 560px) {
-  .search-form {
-    padding-left: 0.85rem;
-  }
-  .submit-btn {
-    padding: 0.55rem 0.95rem;
-  }
+  min-height: 34px;
+  padding: 0.4rem 1.1rem;
+  border-radius: var(--radius-sm);
 }

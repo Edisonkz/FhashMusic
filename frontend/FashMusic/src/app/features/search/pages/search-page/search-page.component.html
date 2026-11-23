@@ -1,20 +1,39 @@
 <div class="page-shell">
-  <header class="hero-card">
-    <div class="hero-top">
-      <div>
-        <div class="page-eyebrow">
-          <span>Descubrimiento Musical</span>
+  <!-- Cinematic Sound House Hero Banner -->
+  <header class="hero-banner explore-hero">
+    <div class="hero-breadcrumb">
+      <span>Inicio</span> / <span>Explorar</span> / <strong>{{ activeQuery() || selectedGenre() }}</strong>
+    </div>
+
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <span class="hero-pill">Tendencias 2026</span>
+        <h1 class="hero-title">Descubre tu música</h1>
+        <p class="hero-sub">Tame Impala · Radiohead · Billie Eilish · Frankie Ruiz</p>
+        <div class="hero-meta-row">
+          <span class="hero-meta-item">{{ visibleSongs().length }} pistas</span>
+          <span class="hero-meta-item">MP3 {{ selectedQuality() }}</span>
+          <span class="hero-meta-item">{{ isDemoResponse() ? 'Modo Studio' : 'API Live' }}</span>
         </div>
-        <h1 class="page-title">Encuentra y reproduce tu próxima canción</h1>
-        <p class="page-subtitle">
-          Explora catálogo en tiempo real, preescucha al instante, organiza tu biblioteca o envía a la cola de descarga en MP3 320kbps y MP4.
-        </p>
       </div>
-      @if (isDemoResponse()) {
-        <span class="badge badge-primary">Catálogo Demo Activo</span>
-      } @else {
-        <span class="badge badge-success">Conectado a API</span>
-      }
+
+      <div class="hero-controls">
+        <div class="quality-group" role="group" aria-label="Selector de calidad">
+          @for (q of qualityOptions; track q) {
+            <button
+              type="button"
+              class="quality-opt"
+              [class.active]="selectedQuality() === q"
+              (click)="selectQuality(q)">
+              {{ q }}
+            </button>
+          }
+        </div>
+
+        <button type="button" class="btn btn-secondary" (click)="saveAllVisible()">
+          + Guardar todo
+        </button>
+      </div>
     </div>
 
     <app-search-bar
@@ -22,83 +41,75 @@
       [isLoading]="isLoading()"
       (searchSubmitted)="onSearch($event)"
     ></app-search-bar>
-
-    <div class="chips-bar">
-      <div class="chip-group" role="tablist" aria-label="Filtrar por género">
-        @for (genre of quickGenres; track genre) {
-          <button
-            type="button"
-            class="chip"
-            [class.active]="selectedGenre() === genre"
-            (click)="selectGenre(genre)">
-            {{ genre }}
-          </button>
-        }
-      </div>
-
-      @if (recentSearches().length > 0) {
-        <div class="recent-row">
-          <span class="recent-label">Recientes:</span>
-          @for (term of recentSearches(); track term) {
-            <button type="button" class="recent-pill" (click)="onSearch(term)">
-              {{ term }}
-            </button>
-          }
-        </div>
-      }
-    </div>
   </header>
 
-  <section class="results-section">
-    <div class="section-bar">
-      <h2 class="section-title">{{ sectionHeading() }}</h2>
-      <span class="badge badge-neutral">{{ visibleSongs().length }} pistas</span>
+  <!-- Underline Genre Tabs + Layout Switcher -->
+  <div class="tabs-bar">
+    <div class="tabs-list" role="tablist" aria-label="Géneros musicales">
+      @for (genre of quickGenres; track genre) {
+        <button
+          type="button"
+          class="tab-btn"
+          [class.active]="selectedGenre() === genre"
+          (click)="selectGenre(genre)">
+          {{ genre }}
+        </button>
+      }
     </div>
 
+    <div class="view-toggle" role="group" aria-label="Modo de vista">
+      <button
+        type="button"
+        class="toggle-btn"
+        [class.active]="viewMode() === 'list'"
+        (click)="viewMode.set('list')"
+        aria-label="Vista editorial en filas">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" />
+          <line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" />
+        </svg>
+      </button>
+      <button
+        type="button"
+        class="toggle-btn"
+        [class.active]="viewMode() === 'grid'"
+        (click)="viewMode.set('grid')"
+        aria-label="Vista en cuadrícula">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
+          <rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Results Section -->
+  <section>
     @if (isLoading()) {
-      <div class="skeleton-grid" aria-label="Cargando resultados">
+      <div class="skeleton-rows" aria-label="Cargando pistas">
         @for (item of skeletonItems; track item) {
-          <div class="skeleton-card surface-card">
-            <div class="skeleton sk-thumb"></div>
-            <div class="sk-body">
-              <div class="skeleton sk-line"></div>
-              <div class="skeleton sk-line short"></div>
-              <div class="sk-btns">
-                <div class="skeleton sk-btn"></div>
-                <div class="skeleton sk-btn"></div>
-              </div>
-            </div>
-          </div>
+          <div class="skeleton sk-row"></div>
         }
       </div>
     } @else if (error()) {
       <div class="state-panel">
-        <div class="state-icon-wrap">
-          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
-        </div>
         <h3>Ocurrió un problema</h3>
-        <p class="page-subtitle">{{ error() }}</p>
-        <button type="button" class="btn btn-secondary" (click)="onSearch(activeQuery())">Reintentar</button>
+        <p class="hero-sub">{{ error() }}</p>
+        <button type="button" class="btn btn-primary" (click)="onSearch(activeQuery())">Reintentar</button>
       </div>
     } @else if (visibleSongs().length > 0) {
       <app-result-gallery
         [songs]="visibleSongs()"
+        [viewMode]="viewMode()"
         (downloadRequested)="handleDownload($event)"
         (previewRequested)="handlePreview($event)"
         (libraryToggled)="handleLibraryToggle($event)"
       ></app-result-gallery>
     } @else {
       <div class="state-panel">
-        <div class="state-icon-wrap">
-          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
-          </svg>
-        </div>
-        <h3>Sin coincidencias en este filtro</h3>
-        <p class="page-subtitle">Prueba con otro género o limpia la búsqueda para ver todo el catálogo.</p>
-        <button type="button" class="btn btn-primary" (click)="selectGenre('Todos')">Ver todas las pistas</button>
+        <h3>Sin coincidencias en "{{ selectedGenre() }}"</h3>
+        <p class="hero-sub">Prueba otro género o limpia la búsqueda.</p>
+        <button type="button" class="btn btn-primary" (click)="selectGenre('Todos')">Ver todas</button>
       </div>
     }
   </section>
