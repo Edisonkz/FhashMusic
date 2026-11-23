@@ -1,0 +1,123 @@
+<div class="page-shell">
+  <header class="page-header">
+    <div>
+      <div class="page-eyebrow">Reconocimiento Acústico</div>
+      <h1 class="page-title">Adivinator</h1>
+      <p class="page-subtitle">Identifica canciones al instante usando el micrófono o cargando un clip de audio.</p>
+    </div>
+    <span class="badge badge-primary">Fingerprint Engine v2</span>
+  </header>
+
+  <section class="studio-grid">
+    <!-- Left: Interactive Radar -->
+    <div class="radar-card surface-card">
+      <div class="radar-stage" [class.listening]="isListening()">
+        <span class="pulse-ring r1" aria-hidden="true"></span>
+        <span class="pulse-ring r2" aria-hidden="true"></span>
+
+        <button
+          type="button"
+          class="radar-btn"
+          (click)="toggleListening()"
+          [attr.aria-label]="isListening() ? 'Detener escucha' : 'Iniciar reconocimiento de audio'">
+          <svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+            <line x1="12" y1="19" x2="12" y2="22" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="waveform" aria-hidden="true">
+        @for (lvl of waveLevels(); track $index) {
+          <span class="wave-bar" [style.height.%]="isListening() ? lvl : 18"></span>
+        }
+      </div>
+
+      <p class="radar-status">{{ statusHint() }}</p>
+
+      <div class="radar-actions">
+        <button type="button" class="btn btn-primary" (click)="toggleListening()">
+          @if (isListening()) {
+            Detener análisis
+          } @else {
+            Escuchar ahora
+          }
+        </button>
+
+        <label class="btn btn-secondary upload-label">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" />
+          </svg>
+          Subir audio
+          <input type="file" accept="audio/*" hidden (change)="onFileSelected($event)" />
+        </label>
+      </div>
+    </div>
+
+    <!-- Right: Match Result + History -->
+    <div class="result-column">
+      @if (latestMatch(); as match) {
+        <article class="match-card surface-card">
+          <div class="match-top">
+            <span class="badge badge-success">{{ match.confidence }}% coincidencia</span>
+            <span class="badge badge-neutral">{{ match.source === 'mic' ? 'Micrófono' : 'Archivo' }} · {{ match.matchedAt }}</span>
+          </div>
+
+          <div class="match-body">
+            <div class="match-cover">
+              @if (match.song.thumbnail) {
+                <img [src]="match.song.thumbnail" [alt]="match.song.title" />
+              }
+            </div>
+            <div class="match-info">
+              <h2>{{ match.song.title }}</h2>
+              <p class="match-artist">{{ match.song.uploader }}</p>
+              <div class="match-meta">
+                @if (match.song.genre) {
+                  <span class="badge badge-primary">{{ match.song.genre }}</span>
+                }
+                <span class="dur-code">{{ match.song.duration | duration }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="match-actions">
+            <button type="button" class="btn btn-primary" (click)="playSong(match.song)">Reproducir</button>
+            <button type="button" class="btn btn-secondary" (click)="saveSong(match.song)">
+              {{ library.isSaved(match.song.id) ? 'En biblioteca' : 'Guardar' }}
+            </button>
+            <button type="button" class="btn btn-secondary" (click)="downloadSong(match.song)">MP3</button>
+          </div>
+        </article>
+      } @else {
+        <div class="state-panel match-empty">
+          <div class="state-icon-wrap">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" />
+            </svg>
+          </div>
+          <h3>Listo para identificar</h3>
+          <p class="page-subtitle">Pulsa el botón del radar para capturar audio o sube un archivo MP3/WAV para detectar artista y título.</p>
+        </div>
+      }
+
+      @if (history().length > 0) {
+        <section class="history-card surface-card">
+          <h3 class="history-title">Historial de esta sesión</h3>
+          <div class="history-list">
+            @for (item of history(); track $index) {
+              <button type="button" class="history-row" (click)="playSong(item.song)">
+                <div class="history-copy">
+                  <strong>{{ item.song.title }}</strong>
+                  <span>{{ item.song.uploader }}</span>
+                </div>
+                <span class="badge badge-neutral">{{ item.confidence }}%</span>
+              </button>
+            }
+          </div>
+        </section>
+      }
+    </div>
+  </section>
+</div>
