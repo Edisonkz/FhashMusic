@@ -138,7 +138,7 @@
     linear-gradient(180deg, #211f28 0%, #17181f 100%);
 }
 
-.workspace-inner { max-width: 1180px; margin: 0 auto; padding: 1.4rem 1.6rem 2.5rem; }
+.workspace-inner { width: 100%; margin: 0; padding: 0 0 2.5rem; }
 .app-shell.has-player .workspace-inner { padding-bottom: calc(var(--player-height) + 2.5rem); }
 
 @media (max-width: 1024px) {
@@ -162,6 +162,6 @@
   .nav-count, .nav-dot { display: none; }
   .nav-badge { position: absolute; top: 4px; right: 14px; min-width: 16px; height: 16px; font-size: 0.6rem; }
   .workspace { margin-left: 0; }
-  .workspace-inner { padding: 1rem 0.9rem calc(var(--mobile-nav-height) + 1.5rem); }
+  .workspace-inner { padding: 0 0 calc(var(--mobile-nav-height) + 1.5rem); }
   .app-shell.has-player .workspace-inner { padding-bottom: calc(var(--mobile-nav-height) + 9rem); }
 }

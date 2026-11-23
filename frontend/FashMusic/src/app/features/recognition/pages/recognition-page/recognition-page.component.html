@@ -1,6 +1,8 @@
 <div class="page-shell">
-  <!-- Atmospheric Studio Header (Mockup 4) -->
-  <header class="hero-banner recognition-hero">
+  <!-- Full-Bleed Horizontal Studio Mic Hero Banner -->
+  <header class="hero-banner">
+    <img class="hero-backdrop-img" src="images/hero-studio.jpg" alt="Adivinator Estudio Acústico" />
+
     <div class="hero-breadcrumb">
       <span>Inicio</span> / <span>Adivinator</span> / <strong>Estudio Acústico</strong>
     </div>
@@ -12,104 +14,106 @@
     </div>
   </header>
 
-  <section class="studio-grid">
-    <!-- Left: Acoustic Radar Card -->
-    <div class="radar-card surface-card">
-      <h2 class="panel-heading">Radar Acústico</h2>
+  <section class="page-body">
+    <div class="studio-grid">
+      <!-- Left: Acoustic Radar Card -->
+      <div class="radar-card surface-card">
+        <h2 class="panel-heading">Radar Acústico</h2>
 
-      <div class="radar-stage" [class.listening]="isListening()">
-        <span class="pulse-ring r1" aria-hidden="true"></span>
-        <span class="pulse-ring r2" aria-hidden="true"></span>
-        <span class="pulse-ring r3" aria-hidden="true"></span>
+        <div class="radar-stage" [class.listening]="isListening()">
+          <span class="pulse-ring r1" aria-hidden="true"></span>
+          <span class="pulse-ring r2" aria-hidden="true"></span>
+          <span class="pulse-ring r3" aria-hidden="true"></span>
 
-        <button
-          type="button"
-          class="radar-btn"
-          (click)="toggleListening()"
-          [attr.aria-label]="isListening() ? 'Detener análisis' : 'Iniciar reconocimiento acústico'">
-          <svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
-            <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-            <line x1="12" y1="19" x2="12" y2="22" />
-          </svg>
-        </button>
-      </div>
+          <button
+            type="button"
+            class="radar-btn"
+            (click)="toggleListening()"
+            [attr.aria-label]="isListening() ? 'Detener análisis' : 'Iniciar reconocimiento acústico'">
+            <svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+              <line x1="12" y1="19" x2="12" y2="22" />
+            </svg>
+          </button>
+        </div>
 
-      <div class="waveform" aria-hidden="true">
-        @for (lvl of waveLevels(); track $index) {
-          <span class="wave-bar" [style.height.%]="isListening() ? lvl : Math.max(18, Math.round(lvl * 0.5))"></span>
-        }
-      </div>
-
-      <p class="radar-status">{{ statusHint() }}</p>
-
-      <div class="radar-actions">
-        <button type="button" class="btn btn-primary btn-pill" (click)="toggleListening()">
-          {{ isListening() ? 'Detener escucha' : 'Escuchar ahora' }}
-        </button>
-
-        <label class="btn btn-secondary btn-pill upload-label">
-          Subir audio
-          <input type="file" accept="audio/*" hidden (change)="onFileSelected($event)" />
-        </label>
-      </div>
-    </div>
-
-    <!-- Right: Match Detected + Session History -->
-    <div class="result-column">
-      @if (latestMatch(); as match) {
-        <article class="match-card surface-card">
-          <div class="match-top">
-            <h2 class="panel-heading">Coincidencia detectada</h2>
-            <span class="badge badge-success">{{ match.confidence }}% coincidencia</span>
-          </div>
-
-          <div class="match-body">
-            <div class="match-cover">
-              @if (match.song.thumbnail) {
-                <img [src]="match.song.thumbnail" [alt]="match.song.title" />
-              }
-            </div>
-            <div class="match-info">
-              <h3>{{ match.song.title }}</h3>
-              <p class="match-artist">{{ match.song.uploader }}</p>
-              <span class="badge badge-neutral meta-pill">
-                {{ match.song.genre || 'Studio' }} · {{ match.song.duration | duration }}
-              </span>
-
-              <div class="match-actions">
-                <button type="button" class="btn btn-light btn-pill" (click)="playSong(match.song)">Reproducir</button>
-                <button type="button" class="btn btn-secondary btn-pill" (click)="saveSong(match.song)">
-                  {{ library.isSaved(match.song.id) ? 'Guardada' : 'Guardar' }}
-                </button>
-                <button type="button" class="btn btn-secondary btn-pill" (click)="downloadSong(match.song)">MP3</button>
-              </div>
-            </div>
-          </div>
-        </article>
-      }
-
-      <section class="history-card surface-card">
-        <h3 class="panel-heading">Historial de sesión</h3>
-        <div class="history-list">
-          @for (item of history(); track item.song.id) {
-            <button type="button" class="history-row" (click)="playSong(item.song)">
-              <span class="history-avatar">
-                @if (item.song.thumbnail) {
-                  <img [src]="item.song.thumbnail" [alt]="item.song.title" loading="lazy" />
-                } @else {
-                  ♪
-                }
-              </span>
-              <div class="history-copy">
-                <strong>{{ item.song.title }}</strong>
-                <span>{{ item.song.uploader }}</span>
-              </div>
-              <span class="badge badge-neutral">{{ item.confidence }}%</span>
-            </button>
+        <div class="waveform" aria-hidden="true">
+          @for (lvl of waveLevels(); track $index) {
+            <span class="wave-bar" [style.height.%]="isListening() ? lvl : Math.max(18, Math.round(lvl * 0.5))"></span>
           }
         </div>
-      </section>
+
+        <p class="radar-status">{{ statusHint() }}</p>
+
+        <div class="radar-actions">
+          <button type="button" class="btn btn-primary btn-pill" (click)="toggleListening()">
+            {{ isListening() ? 'Detener escucha' : 'Escuchar ahora' }}
+          </button>
+
+          <label class="btn btn-secondary btn-pill upload-label">
+            Subir audio
+            <input type="file" accept="audio/*" hidden (change)="onFileSelected($event)" />
+          </label>
+        </div>
+      </div>
+
+      <!-- Right: Match Detected + Session History -->
+      <div class="result-column">
+        @if (latestMatch(); as match) {
+          <article class="match-card surface-card">
+            <div class="match-top">
+              <h2 class="panel-heading">Coincidencia detectada</h2>
+              <span class="badge badge-success">{{ match.confidence }}% coincidencia</span>
+            </div>
+
+            <div class="match-body">
+              <div class="match-cover">
+                @if (match.song.thumbnail) {
+                  <img [src]="match.song.thumbnail" [alt]="match.song.title" />
+                }
+              </div>
+              <div class="match-info">
+                <h3>{{ match.song.title }}</h3>
+                <p class="match-artist">{{ match.song.uploader }}</p>
+                <span class="badge badge-neutral meta-pill">
+                  {{ match.song.genre || 'Studio' }} · {{ match.song.duration | duration }}
+                </span>
+
+                <div class="match-actions">
+                  <button type="button" class="btn btn-light btn-pill" (click)="playSong(match.song)">Reproducir</button>
+                  <button type="button" class="btn btn-secondary btn-pill" (click)="saveSong(match.song)">
+                    {{ library.isSaved(match.song.id) ? 'Guardada' : 'Guardar' }}
+                  </button>
+                  <button type="button" class="btn btn-secondary btn-pill" (click)="downloadSong(match.song)">MP3</button>
+                </div>
+              </div>
+            </div>
+          </article>
+        }
+
+        <section class="history-card surface-card">
+          <h3 class="panel-heading">Historial de sesión</h3>
+          <div class="history-list">
+            @for (item of history(); track item.song.id) {
+              <button type="button" class="history-row" (click)="playSong(item.song)">
+                <span class="history-avatar">
+                  @if (item.song.thumbnail) {
+                    <img [src]="item.song.thumbnail" [alt]="item.song.title" loading="lazy" />
+                  } @else {
+                    ♪
+                  }
+                </span>
+                <div class="history-copy">
+                  <strong>{{ item.song.title }}</strong>
+                  <span>{{ item.song.uploader }}</span>
+                </div>
+                <span class="badge badge-neutral">{{ item.confidence }}%</span>
+              </button>
+            }
+          </div>
+        </section>
+      </div>
     </div>
   </section>
 </div>
