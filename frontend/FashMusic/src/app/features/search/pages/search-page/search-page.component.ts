@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { SearchService } from '../../services/search.service';
 import { SongResult } from '../../models/search-result.model';
 import { SearchBarComponent } from '../../components/search-bar/search-bar.component';
@@ -6,6 +7,7 @@ import { ResultGalleryComponent } from '../../components/result-gallery/result-g
 import { DownloadService } from '../../../download/services/download.service';
 import { LibraryService } from '../../../library/services/library.service';
 import { PlayerStore } from '../../../../core/services/player.store';
+import { ToastService } from '../../../../core/services/toast.service';
 import { DEMO_CATALOG } from '../../../../core/data/demo-catalog.data';
 
 @Component({
@@ -16,22 +18,26 @@ import { DEMO_CATALOG } from '../../../../core/data/demo-catalog.data';
   styleUrl: './search-page.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SearchPageComponent {
+export class SearchPageComponent implements OnInit {
+  private readonly route = inject(ActivatedRoute);
   private readonly searchService = inject(SearchService);
   private readonly downloadService = inject(DownloadService);
   private readonly libraryService = inject(LibraryService);
   private readonly playerStore = inject(PlayerStore);
+  private readonly toast = inject(ToastService);
 
-  protected readonly quickGenres = ['Todos', 'Rock', 'Indie', 'Latino', 'Pop', 'Salsa', 'Clásicos'];
-  protected readonly skeletonItems = [1, 2, 3, 4, 5, 6, 7, 8];
+  protected readonly quickGenres = ['Todos', 'Rock', 'Indie', 'Latino', 'Salsa', 'Clásicos'];
+  protected readonly qualityOptions = ['FLAC', '320', '128'] as const;
+  protected readonly skeletonItems = [1, 2, 3, 4, 5, 6];
 
   protected readonly activeQuery = signal('');
   protected readonly selectedGenre = signal('Todos');
+  protected readonly selectedQuality = signal<'FLAC' | '320' | '128'>('320');
+  protected readonly viewMode = signal<'list' | 'grid'>('list');
   protected readonly results = signal<SongResult[]>(DEMO_CATALOG);
   protected readonly isLoading = signal(false);
   protected readonly isDemoResponse = signal(true);
   protected readonly error = signal<string | null>(null);
-  protected readonly recentSearches = signal<string[]>(['Tame Impala', 'Radiohead', 'Frankie Ruiz']);
 
   protected readonly visibleSongs = computed(() => {
     const genre = this.selectedGenre();
@@ -40,12 +46,14 @@ export class SearchPageComponent {
     return list.filter((s) => (s.genre ?? '').toLowerCase() === genre.toLowerCase());
   });
 
-  protected readonly sectionHeading = computed(() => {
-    const q = this.activeQuery().trim();
-    if (q) return `Resultados para "${q}"`;
-    const g = this.selectedGenre();
-    return g === 'Todos' ? 'Tendencias y recomendados' : `Explorar · ${g}`;
-  });
+  ngOnInit(): void {
+    this.route.queryParamMap.subscribe((params) => {
+      const q = params.get('q')?.trim() ?? '';
+      if (q && q !== this.activeQuery()) {
+        this.onSearch(q);
+      }
+    });
+  }
 
   onSearch(query: string): void {
     const clean = query.trim();
@@ -60,8 +68,6 @@ export class SearchPageComponent {
     }
 
     this.isLoading.set(true);
-    this.recentSearches.update((prev) => [clean, ...prev.filter((item) => item.toLowerCase() !== clean.toLowerCase())].slice(0, 5));
-
     this.searchService.search(clean).subscribe({
       next: (response) => {
         this.results.set(response.results);
@@ -69,7 +75,7 @@ export class SearchPageComponent {
         this.isLoading.set(false);
       },
       error: () => {
-        this.error.set('No se pudieron cargar los resultados. Verifica tu conexión e intenta de nuevo.');
+        this.error.set('No se pudieron cargar los resultados. Intenta de nuevo.');
         this.isLoading.set(false);
       }
     });
@@ -81,6 +87,25 @@ export class SearchPageComponent {
       this.activeQuery.set('');
       this.results.set(DEMO_CATALOG);
       this.isDemoResponse.set(true);
+    }
+  }
+
+  selectQuality(q: 'FLAC' | '320' | '128'): void {
+    this.selectedQuality.set(q);
+    this.toast.info(`Calidad seleccionada: ${q === 'FLAC' ? 'FLAC Lossless' : q + ' kbps'}`);
+  }
+
+  saveAllVisible(): void {
+    const list = this.visibleSongs();
+    let added = 0;
+    for (const song of list) {
+      if (!this.libraryService.isSaved(song.id)) {
+        this.libraryService.addToLibrary(song);
+        added++;
+      }
+    }
+    if (added === 0) {
+      this.toast.info('Todo guardado', 'Estas pistas ya están en tu biblioteca');
     }
   }
 

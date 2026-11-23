@@ -28,11 +28,21 @@ export class RecognitionPageComponent implements OnDestroy {
   private readonly downloads = inject(DownloadService);
   private readonly toast = inject(ToastService);
 
+  protected readonly Math = Math;
   protected readonly isListening = signal(false);
   protected readonly statusHint = signal('Toca el radar acústico o sube un fragmento de audio');
-  protected readonly waveLevels = signal<number[]>([22, 36, 52, 40, 68, 45, 74, 58, 38, 60, 44, 28]);
-  protected readonly latestMatch = signal<RecognitionMatch | null>(null);
-  protected readonly history = signal<RecognitionMatch[]>([]);
+  protected readonly waveLevels = signal<number[]>([24, 38, 56, 44, 72, 48, 82, 62, 42, 66, 46, 30, 52, 34]);
+  protected readonly latestMatch = signal<RecognitionMatch | null>({
+    song: DEMO_CATALOG[10] ?? DEMO_CATALOG[0],
+    confidence: 97,
+    source: 'mic',
+    matchedAt: 'Reciente'
+  });
+  protected readonly history = signal<RecognitionMatch[]>([
+    { song: DEMO_CATALOG[0], confidence: 96, source: 'mic', matchedAt: 'Hoy' },
+    { song: DEMO_CATALOG[1], confidence: 94, source: 'file', matchedAt: 'Hoy' },
+    { song: DEMO_CATALOG[5], confidence: 92, source: 'mic', matchedAt: 'Hoy' }
+  ]);
 
   private waveTimer: ReturnType<typeof setInterval> | null = null;
   private matchTimer: ReturnType<typeof setTimeout> | null = null;
@@ -41,13 +51,12 @@ export class RecognitionPageComponent implements OnDestroy {
 
   async toggleListening(): Promise<void> {
     if (this.isListening()) {
-      this.stopListening('Escucha cancelada');
+      this.stopListening('Escucha detenida');
       return;
     }
 
     this.isListening.set(true);
-    this.latestMatch.set(null);
-    this.statusHint.set('Analizando firma acústica en tiempo real...');
+    this.statusHint.set('Analizando firma acústica...');
 
     try {
       if (navigator.mediaDevices?.getUserMedia) {
@@ -57,13 +66,13 @@ export class RecognitionPageComponent implements OnDestroy {
         this.startSimulatedWaves();
       }
     } catch {
-      this.statusHint.set('Micrófono no disponible · ejecutando análisis de muestra demo...');
+      this.statusHint.set('Analizando firma acústica (modo studio)...');
       this.startSimulatedWaves();
     }
 
     this.matchTimer = setTimeout(() => {
       this.completeRecognition('mic');
-    }, 3200);
+    }, 3000);
   }
 
   onFileSelected(event: Event): void {
@@ -73,14 +82,13 @@ export class RecognitionPageComponent implements OnDestroy {
 
     this.stopListening();
     this.isListening.set(true);
-    this.latestMatch.set(null);
-    this.statusHint.set(`Procesando "${file.name}"...`);
+    this.statusHint.set(`Analizando "${file.name}"...`);
     this.startSimulatedWaves();
 
     this.matchTimer = setTimeout(() => {
       this.completeRecognition('file', file.name);
       input.value = '';
-    }, 2000);
+    }, 1800);
   }
 
   playSong(song: SongResult): void {
@@ -109,8 +117,8 @@ export class RecognitionPageComponent implements OnDestroy {
     const data = new Uint8Array(analyser.frequencyBinCount);
     this.waveTimer = setInterval(() => {
       analyser.getByteFrequencyData(data);
-      const bars = Array.from({ length: 12 }, (_, idx) => {
-        const val = data[idx * 2] ?? 20;
+      const bars = Array.from({ length: 14 }, (_, idx) => {
+        const val = data[idx] ?? 24;
         return Math.max(16, Math.min(100, Math.round((val / 255) * 100)));
       });
       this.waveLevels.set(bars);
@@ -119,7 +127,7 @@ export class RecognitionPageComponent implements OnDestroy {
 
   private startSimulatedWaves(): void {
     this.waveTimer = setInterval(() => {
-      const bars = Array.from({ length: 12 }, () => Math.floor(20 + Math.random() * 78));
+      const bars = Array.from({ length: 14 }, () => Math.floor(20 + Math.random() * 78));
       this.waveLevels.set(bars);
     }, 110);
   }
@@ -130,10 +138,10 @@ export class RecognitionPageComponent implements OnDestroy {
 
     if (fileName) {
       const lower = fileName.toLowerCase();
-      const matchedByFile = pool.find(
+      const matched = pool.find(
         (s) => lower.includes(s.title.toLowerCase()) || lower.includes(s.uploader.toLowerCase())
       );
-      if (matchedByFile) pick = matchedByFile;
+      if (matched) pick = matched;
     }
 
     const match: RecognitionMatch = {
@@ -145,7 +153,7 @@ export class RecognitionPageComponent implements OnDestroy {
 
     this.stopListening('¡Coincidencia encontrada!');
     this.latestMatch.set(match);
-    this.history.update((prev) => [match, ...prev].slice(0, 6));
+    this.history.update((prev) => [match, ...prev.filter((h) => h.song.id !== pick.id)].slice(0, 5));
     this.toast.success('Canción identificada', `${pick.uploader} — ${pick.title}`);
   }
 

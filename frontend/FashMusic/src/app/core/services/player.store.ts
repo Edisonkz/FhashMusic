@@ -1,5 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { SongResult } from '../../features/search/models/search-result.model';
+import { DEMO_CATALOG } from '../data/demo-catalog.data';
 import { environment } from '../../../environments/environment';
 import { ToastService } from './toast.service';
 
@@ -13,21 +14,27 @@ export class PlayerStore {
 
   private readonly _currentTrack = signal<SongResult | null>(null);
   private readonly _queue = signal<SongResult[]>([]);
+  private readonly _recentTracks = signal<SongResult[]>(DEMO_CATALOG.slice(0, 3));
   private readonly _isPlaying = signal(false);
   private readonly _currentTime = signal(0);
   private readonly _duration = signal(0);
   private readonly _volume = signal(0.8);
   private readonly _isMuted = signal(false);
   private readonly _isDemoMode = signal(false);
+  private readonly _isShuffle = signal(false);
+  private readonly _isRepeat = signal(false);
 
   readonly currentTrack = this._currentTrack.asReadonly();
   readonly queue = this._queue.asReadonly();
+  readonly recentTracks = this._recentTracks.asReadonly();
   readonly isPlaying = this._isPlaying.asReadonly();
   readonly currentTime = this._currentTime.asReadonly();
   readonly duration = this._duration.asReadonly();
   readonly volume = this._volume.asReadonly();
   readonly isMuted = this._isMuted.asReadonly();
   readonly isDemoMode = this._isDemoMode.asReadonly();
+  readonly isShuffle = this._isShuffle.asReadonly();
+  readonly isRepeat = this._isRepeat.asReadonly();
 
   readonly progressPercent = computed(() => {
     const dur = this._duration();
@@ -35,6 +42,7 @@ export class PlayerStore {
   });
 
   readonly hasNext = computed(() => {
+    if (this._isShuffle() && this._queue().length > 1) return true;
     const idx = this.currentIndex();
     return idx >= 0 && idx < this._queue().length - 1;
   });
@@ -76,6 +84,8 @@ export class PlayerStore {
       this._queue.update((q) => [song, ...q]);
     }
 
+    this._recentTracks.update((prev) => [song, ...prev.filter((item) => item.id !== song.id)].slice(0, 3));
+
     if (isSameTrack) {
       this.togglePlay();
       return;
@@ -96,7 +106,6 @@ export class PlayerStore {
 
   togglePlay(): void {
     if (!this._currentTrack()) return;
-
     if (this._isPlaying()) {
       this.pause();
     } else {
@@ -123,19 +132,12 @@ export class PlayerStore {
     this.safeAudioPlay(track, false);
   }
 
-  private safeAudioPlay(song: SongResult, notifyOnFallback: boolean): void {
-    try {
-      const result = this.audio.play();
-      if (result && typeof result.then === 'function') {
-        result
-          .then(() => this._isPlaying.set(true))
-          .catch(() => this.startSimulatedPlayback(song, notifyOnFallback));
-      } else {
-        this.startSimulatedPlayback(song, notifyOnFallback);
-      }
-    } catch {
-      this.startSimulatedPlayback(song, notifyOnFallback);
-    }
+  toggleShuffle(): void {
+    this._isShuffle.update((v) => !v);
+  }
+
+  toggleRepeat(): void {
+    this._isRepeat.update((v) => !v);
   }
 
   seek(seconds: number): void {
@@ -161,8 +163,20 @@ export class PlayerStore {
   }
 
   next(): void {
-    const idx = this.currentIndex();
     const list = this._queue();
+    if (list.length === 0) return;
+
+    if (this._isShuffle() && list.length > 1) {
+      const currentId = this._currentTrack()?.id;
+      const candidates = list.filter((s) => s.id !== currentId);
+      const randomSong = candidates[Math.floor(Math.random() * candidates.length)];
+      if (randomSong) {
+        this.playTrack(randomSong);
+      }
+      return;
+    }
+
+    const idx = this.currentIndex();
     if (idx >= 0 && idx < list.length - 1) {
       this.playTrack(list[idx + 1]);
     }
@@ -189,13 +203,28 @@ export class PlayerStore {
     this._isDemoMode.set(false);
   }
 
+  private safeAudioPlay(song: SongResult, notifyOnFallback: boolean): void {
+    try {
+      const result = this.audio.play();
+      if (result && typeof result.then === 'function') {
+        result
+          .then(() => this._isPlaying.set(true))
+          .catch(() => this.startSimulatedPlayback(song, notifyOnFallback));
+      } else {
+        this.startSimulatedPlayback(song, notifyOnFallback);
+      }
+    } catch {
+      this.startSimulatedPlayback(song, notifyOnFallback);
+    }
+  }
+
   private startSimulatedPlayback(song: SongResult, notify = true): void {
     this._isDemoMode.set(true);
     this._duration.set(song.duration || 210);
     this._isPlaying.set(true);
     this.runSimulationTimer();
     if (notify) {
-      this.toast.info('Preescucha en modo demo', `Reproduciendo vista previa simulada de "${song.title}"`);
+      this.toast.info('Preescucha en modo studio', `Reproduciendo vista previa de "${song.title}"`);
     }
   }
 
@@ -220,6 +249,11 @@ export class PlayerStore {
 
   private handleTrackEnded(): void {
     this.stopSimulation();
+    if (this._isRepeat()) {
+      this.seek(0);
+      this.resume();
+      return;
+    }
     if (this.hasNext()) {
       this.next();
     } else {
