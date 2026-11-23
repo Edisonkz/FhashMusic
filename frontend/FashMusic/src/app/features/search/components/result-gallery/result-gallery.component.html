@@ -1,0 +1,10 @@
+<div class="gallery-grid">
+  @for (song of songs(); track song.id) {
+    <app-song-card
+      [song]="song"
+      (downloadRequested)="downloadRequested.emit($event)"
+      (previewRequested)="previewRequested.emit($event)"
+      (libraryToggled)="libraryToggled.emit($event)"
+    ></app-song-card>
+  }
+</div>
