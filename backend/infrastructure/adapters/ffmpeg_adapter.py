@@ -21,7 +21,7 @@ class FFmpegAdapter(IDownloadRepository):
     ) -> Path:
         output_dir.mkdir(parents=True, exist_ok=True)
         out_template = str(output_dir / f"{song_id}.%(ext)s")
-        target_url = f"https://www.youtube.com/watch?v={song_id}" if not url.startswith("http") else url
+        target_url = f"https://www.youtube.com/watch?v={song_id}" if song_id else url
 
         if format == DownloadFormat.MP3:
             opts = {

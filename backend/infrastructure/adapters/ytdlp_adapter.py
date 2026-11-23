@@ -11,15 +11,15 @@ class YtDlpAdapter(IYoutubeRepository):
 
     def search(self, query: str, max_results: int = 5) -> List[Song]:
         is_url = query.startswith(("http://", "https://"))
+        search_target = query if is_url else f"ytsearch{max_results}:{query}"
         opts = {
             "quiet": True,
             "no_warnings": True,
             "skip_download": True,
-            "extract_flat": not is_url,
-            "default_search": f"ytsearch{max_results}",
+            "extract_flat": "in_playlist",
         }
         with yt_dlp.YoutubeDL(opts) as ydl:
-            info = ydl.extract_info(query, download=False)
+            info = ydl.extract_info(search_target, download=False)
             if not info:
                 return []
             entries = info.get("entries", [info]) if isinstance(info, dict) else []
