@@ -1,0 +1,102 @@
+<div class="page-shell">
+  <header class="page-header">
+    <div>
+      <div class="page-eyebrow">Gestor de Cola</div>
+      <h1 class="page-title">Descargas</h1>
+      <p class="page-subtitle">Monitorea en tiempo real la extracción de audio en MP3 320kbps y video MP4 con metadatos.</p>
+    </div>
+
+    <div class="header-actions">
+      @if (downloads.completedCount() > 0) {
+        <button type="button" class="btn btn-secondary" (click)="downloads.clearCompleted()">
+          Limpiar completadas
+        </button>
+      }
+      <a routerLink="/search" class="btn btn-primary">Nueva descarga</a>
+    </div>
+  </header>
+
+  <section class="stats-grid" aria-label="Resumen de descargas">
+    <div class="stat-card surface-card">
+      <span class="stat-label">En progreso</span>
+      <strong class="stat-value accent">{{ downloads.activeCount() }}</strong>
+    </div>
+    <div class="stat-card surface-card">
+      <span class="stat-label">Completadas</span>
+      <strong class="stat-value success">{{ downloads.completedCount() }}</strong>
+    </div>
+    <div class="stat-card surface-card">
+      <span class="stat-label">Fallidas</span>
+      <strong class="stat-value danger">{{ downloads.failedCount() }}</strong>
+    </div>
+  </section>
+
+  @if (downloads.tasks().length > 0) {
+    <section class="tasks-list">
+      @for (task of downloads.tasks(); track task.song_id) {
+        <article class="task-card surface-card">
+          <div class="task-top">
+            <div class="task-info">
+              <div class="task-thumb">
+                @if (task.thumbnail) {
+                  <img [src]="task.thumbnail" [alt]="task.title || task.song_id" loading="lazy" />
+                } @else {
+                  <span>♪</span>
+                }
+              </div>
+              <div class="task-meta">
+                <h3 class="task-title">{{ task.title || task.song_id }}</h3>
+                <p class="task-artist">{{ task.uploader || 'YouTube Audio' }}</p>
+              </div>
+            </div>
+
+            <div class="task-badges">
+              <span class="badge badge-neutral format-pill">
+                {{ task.format === 'mp3' ? 'MP3 · 320k' : 'MP4 · HD' }}
+              </span>
+              <span [class]="getBadgeClass(task.status)">{{ getStatusLabel(task.status) }}</span>
+
+              @if (task.status === 'failed') {
+                <button type="button" class="btn btn-secondary btn-sm" (click)="downloads.retryTask(task.song_id)">
+                  Reintentar
+                </button>
+              }
+
+              <button
+                type="button"
+                class="icon-btn"
+                (click)="downloads.removeTask(task.song_id)"
+                aria-label="Quitar de la cola">
+                ×
+              </button>
+            </div>
+          </div>
+
+          <app-progress-bar
+            [progress]="task.progress"
+            [status]="task.status"
+            [statusText]="getStatusText(task)"
+          ></app-progress-bar>
+
+          @if (task.output_path) {
+            <div class="output-path">
+              <span class="path-label">Archivo:</span>
+              <code>{{ task.output_path }}</code>
+            </div>
+          }
+        </article>
+      }
+    </section>
+  } @else {
+    <div class="state-panel">
+      <div class="state-icon-wrap">
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+      </div>
+      <h3>No hay descargas en cola</h3>
+      <p class="page-subtitle">Selecciona cualquier canción en Explorar o Mi Biblioteca para iniciar una descarga.</p>
+      <a routerLink="/search" class="btn btn-primary">Explorar canciones</a>
+    </div>
+  }
+</div>
