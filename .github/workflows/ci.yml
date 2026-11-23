@@ -1,0 +1,44 @@
+name: CI — FhashMusic
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  backend-tests:
+    name: Backend · FastAPI Unit & Integration
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run unittest suite
+        run: python -m unittest discover -s tests -v
+
+  frontend-build-and-test:
+    name: Frontend · Angular Build & Vitest
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend/FashMusic
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/FashMusic/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Production build
+        run: npm run build
+      - name: Unit tests (Vitest)
+        run: npx ng test --watch=false
