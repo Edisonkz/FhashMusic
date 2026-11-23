@@ -91,12 +91,7 @@ export class PlayerStore {
     this.audio.src = streamUrl;
     this.audio.load();
 
-    this.audio.play().then(() => {
-      this._isPlaying.set(true);
-    }).catch(() => {
-      // Fallback fluido para modo demo/portafolio cuando el backend no está activo
-      this.startSimulatedPlayback(song);
-    });
+    this.safeAudioPlay(song, true);
   }
 
   togglePlay(): void {
@@ -125,11 +120,22 @@ export class PlayerStore {
       return;
     }
 
-    this.audio.play().then(() => {
-      this._isPlaying.set(true);
-    }).catch(() => {
-      this.startSimulatedPlayback(track, false);
-    });
+    this.safeAudioPlay(track, false);
+  }
+
+  private safeAudioPlay(song: SongResult, notifyOnFallback: boolean): void {
+    try {
+      const result = this.audio.play();
+      if (result && typeof result.then === 'function') {
+        result
+          .then(() => this._isPlaying.set(true))
+          .catch(() => this.startSimulatedPlayback(song, notifyOnFallback));
+      } else {
+        this.startSimulatedPlayback(song, notifyOnFallback);
+      }
+    } catch {
+      this.startSimulatedPlayback(song, notifyOnFallback);
+    }
   }
 
   seek(seconds: number): void {
