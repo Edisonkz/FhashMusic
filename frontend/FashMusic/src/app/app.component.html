@@ -1,79 +1,134 @@
-<div class="app-shell" [class.has-player]="!!player.currentTrack()">
-  <!-- Desktop Sidebar / Mobile Header -->
+<div class="app-shell" [class.has-player]="!!player.currentTrack()" [class.warm-ambient]="warmAmbient()">
+  <!-- Left Matte Charcoal Sidebar -->
   <aside class="sidebar" aria-label="Navegación principal">
     <a routerLink="/search" class="brand">
-      <span class="brand-mark" aria-hidden="true">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" />
-        </svg>
-      </span>
-      <span class="brand-copy">
-        <span class="brand-name">{{ title() }}</span>
-        <span class="brand-tag">Studio v2.0</span>
-      </span>
+      <span class="brand-name"><span class="brand-accent">Fhash</span>Music</span>
     </a>
 
+    <form class="quick-search" (ngSubmit)="submitQuickSearch()" role="search">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
+      </svg>
+      <input
+        type="search"
+        name="quickSearch"
+        [ngModel]="quickQuery()"
+        (ngModelChange)="quickQuery.set($event)"
+        placeholder="Buscar..."
+        aria-label="Búsqueda rápida" />
+    </form>
+
+    <div class="menu-label">Menu</div>
     <nav class="nav-list">
       <a routerLink="/search" routerLinkActive="active" class="nav-link">
-        <svg class="nav-svg" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
+        <svg class="nav-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9">
+          <circle cx="12" cy="12" r="10" /><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
         </svg>
         <span class="nav-label">Explorar</span>
       </a>
 
       <a routerLink="/library" routerLinkActive="active" class="nav-link">
-        <svg class="nav-svg" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+        <svg class="nav-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9">
+          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
         </svg>
         <span class="nav-label">Mi Biblioteca</span>
         @if (library.count() > 0) {
-          <span class="nav-pill">{{ library.count() }}</span>
+          <span class="nav-count">{{ library.count() }}</span>
         }
       </a>
 
       <a routerLink="/download" routerLinkActive="active" class="nav-link">
-        <svg class="nav-svg" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="nav-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
         </svg>
         <span class="nav-label">Descargas</span>
         @if (downloads.activeCount() > 0) {
-          <span class="nav-pill nav-pill-active">{{ downloads.activeCount() }}</span>
-        } @else if (downloads.completedCount() > 0) {
-          <span class="nav-pill">{{ downloads.completedCount() }}</span>
+          <span class="nav-badge">{{ downloads.activeCount() }}</span>
+        } @else {
+          <span class="nav-dot" aria-hidden="true"></span>
         }
       </a>
 
       <a routerLink="/recognition" routerLinkActive="active" class="nav-link">
-        <svg class="nav-svg" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="nav-svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9">
           <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" y1="19" x2="12" y2="22" />
         </svg>
         <span class="nav-label">Adivinator</span>
       </a>
     </nav>
 
-    <div class="sidebar-footer">
-      <div class="status-chip" [class.online]="search.isBackendOnline() === true">
-        <span class="status-dot"></span>
-        <span>
-          @if (search.isBackendOnline() === true) {
-            API FastAPI Live
-          } @else {
-            Modo Portfolio Demo
-          }
+    <!-- Recently Played Widget -->
+    <section class="recent-widget" aria-label="Reproducidos recientemente">
+      <div class="recent-head">
+        <span>Recientes</span>
+      </div>
+      <div class="recent-items">
+        @for (item of player.recentTracks(); track item.id) {
+          <button type="button" class="recent-item" (click)="playRecent(item)">
+            <span class="recent-avatar">
+              @if (item.thumbnail) {
+                <img [src]="item.thumbnail" [alt]="item.title" loading="lazy" />
+              } @else {
+                ♪
+              }
+            </span>
+            <span class="recent-copy">
+              <strong>{{ item.title }}</strong>
+              <span>{{ item.uploader }}</span>
+            </span>
+          </button>
+        }
+      </div>
+    </section>
+
+    <!-- User Profile Footer -->
+    <div class="sidebar-profile">
+      <div class="profile-avatar">E</div>
+      <div class="profile-meta">
+        <strong>Edison</strong>
+        <span class="status-chip" [class.online]="search.isBackendOnline() === true">
+          <span class="status-dot"></span>
+          {{ search.isBackendOnline() === true ? 'API Live' : 'Studio v2.0' }}
         </span>
       </div>
-      <p class="footer-meta">Angular 21 · Signals · OnPush</p>
     </div>
   </aside>
 
-  <!-- Main Workspace -->
+  <!-- Center Frosted Main Workspace -->
   <main class="workspace">
     <div class="workspace-inner">
       <router-outlet></router-outlet>
     </div>
   </main>
 
-  <!-- Global Persistent Audio Dock -->
+  <!-- Slim Right Utility Rail (Sound House Signature) -->
+  <aside class="utility-rail" aria-label="Herramientas rápidas">
+    <div class="rail-group">
+      <button type="button" class="rail-btn" (click)="showNotifications()" aria-label="Notificaciones">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" />
+        </svg>
+      </button>
+      <button type="button" class="rail-btn" (click)="showAudioSettings()" aria-label="Ajustes de audio">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+        </svg>
+      </button>
+      <button type="button" class="rail-btn" [class.active]="warmAmbient()" (click)="toggleAmbient()" aria-label="Alternar ambiente">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="12" r="4" /><path d="M12 2v2" /><path d="M12 20v2" /><path d="m4.93 4.93 1.41 1.41" /><path d="m17.66 17.66 1.41 1.41" /><path d="M2 12h2" /><path d="M20 12h2" />
+        </svg>
+      </button>
+    </div>
+
+    <a routerLink="/download" class="rail-btn" aria-label="Ir a descargas">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
+      </svg>
+    </a>
+  </aside>
+
+  <!-- Global Frosted Bottom Player -->
   <app-audio-player></app-audio-player>
 
   <!-- Global Toast Stack -->
